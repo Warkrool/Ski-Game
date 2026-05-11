@@ -1,22 +1,45 @@
 using UnityEngine;
 using System;
+using System.Security.Cryptography;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public delegate void TimerEvent();
     private DateTime raceStart;
     private TimeSpan raceTime;
+    private TimeSpan penaltyTime;
+    private TimeSpan bestTime;
     private bool racing = false;
+    [SerializeField] private TMP_Text timerText, bestTimeText;
+    [SerializeField] private string bestTimeKey = "BestTimeLVL1";
     private void OnEnable()
     {
         Debug.Log("enabling");
         StartGate.StartRace += StartRace;
         FinishGate.FinishRace += FinishRace;
+        CheckFlag.TimePenalty += AddTimePenalty;
     }
-
+    private void start()
+    {
+        int bestTimeInt = PlayerPrefs.GetInt(bestTimeKey, int.MaxValue);
+        bestTime = new TimeSpan(bestTimeInt);
+        timerText.text = "Best Time" + raceTime.ToString("mm\\:ss");
+    }
+    void AddTimePenalty()
+    {
+        penaltyTime += new TimeSpan(0, 0, 3);
+    }
     void FinishRace()
     {
         Debug.Log("ending race");
+        racing= false;
+        if(raceTime<bestTime)
+        {
+            timerText.text = "Best Time" + raceTime.ToString("mm\\:ss");
+            PlayerPrefs.SetInt(bestTimeKey, (int)raceTime.Ticks);
+            PlayerPrefs.Save();
+        }
     }
     void StartRace()
     {
@@ -29,7 +52,8 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if(racing)
-        raceTime = DateTime.Now - raceStart;
-        Debug.Log("race time" + raceTime);
+        raceTime = DateTime.Now - raceStart + penaltyTime;
+        timerText.text = "Time" + raceTime.ToString("mm\\:ss");
+
     }
 }

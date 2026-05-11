@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private bool disabled = false;
     [SerializeField] private float disableTime = 2f;
     private float lastDisableTime;
+    public static Transform playerPos;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private void Awake()
@@ -22,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        playerPos = transform;
     }
 
     private void OnEnable()
@@ -36,7 +38,10 @@ public class PlayerMovement : MonoBehaviour
         rb.AddForce(pushbackForce);
         Debug.Log("I got hit");
     }
+    private void OnDisable()
+    {
 
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
