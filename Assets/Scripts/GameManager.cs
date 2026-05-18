@@ -15,16 +15,21 @@ public class GameManager : MonoBehaviour
     [SerializeField] private string bestTimeKey = "BestTimeLVL1";
     private void OnEnable()
     {
-        Debug.Log("enabling");
         StartGate.StartRace += StartRace;
         FinishGate.FinishRace += FinishRace;
         CheckFlag.TimePenalty += AddTimePenalty;
     }
-    private void start()
+    private void OnDisable()
+    {
+        StartGate.StartRace -= StartRace;
+        FinishGate.FinishRace -= FinishRace;
+        CheckFlag.TimePenalty -= AddTimePenalty;
+    }
+    private void Start()
     {
         int bestTimeInt = PlayerPrefs.GetInt(bestTimeKey, int.MaxValue);
         bestTime = new TimeSpan(bestTimeInt);
-        timerText.text = "Best Time" + raceTime.ToString("mm\\:ss");
+        bestTimeText.text = "Best Time" + raceTime.ToString("mm\\:ss");
     }
     void AddTimePenalty()
     {
@@ -34,9 +39,10 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("ending race");
         racing= false;
+        GameData.Instance.AddLevelTime((float)raceTime.TotalMilliseconds/1000f);
         if(raceTime<bestTime)
         {
-            timerText.text = "Best Time" + raceTime.ToString("mm\\:ss");
+            bestTimeText.text = "Best Time" + raceTime.ToString("mm\\:ss");
             PlayerPrefs.SetInt(bestTimeKey, (int)raceTime.Ticks);
             PlayerPrefs.Save();
         }
@@ -51,9 +57,10 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(racing)
-        raceTime = DateTime.Now - raceStart + penaltyTime;
-        timerText.text = "Time" + raceTime.ToString("mm\\:ss");
-
+        if (racing)
+        {
+            raceTime = DateTime.Now - raceStart + penaltyTime;
+            timerText.text = "Time" + raceTime.ToString("mm\\:ss");
+        }
     }
 }

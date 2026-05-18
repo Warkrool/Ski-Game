@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Vector3 pushbackForce;
     [SerializeField] private bool disabled = false;
     [SerializeField] private float disableTime = 2f;
+    private Animator animator;
     private float lastDisableTime;
     public static Transform playerPos;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -23,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
         playerPos = transform;
     }
 
@@ -58,9 +60,9 @@ public class PlayerMovement : MonoBehaviour
                 float speedMult = Mathf.Cos(Mathf.Deg2Rad * slopeAngle);
                 rb.AddForce(transform.forward * moveSpeed * speedMult * Time.fixedDeltaTime);
                 transform.Rotate(0, moveVector.x * rotationSpeed * Time.fixedDeltaTime, 0);
-
-
             }
+            animator.SetBool("grounded", isGrounded);
+            animator.SetFloat("playerSpeed", rb.linearVelocity.magnitude);
         }
     }
 }
