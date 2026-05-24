@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     private bool racing = false;
     [SerializeField] private TMP_Text timerText, bestTimeText;
     [SerializeField] private string bestTimeKey = "BestTimeLVL1";
+    [SerializeField] private LeaderboardUI leaderboardUI;
     private void OnEnable()
     {
         StartGate.StartRace += StartRace;
@@ -29,7 +30,7 @@ public class GameManager : MonoBehaviour
     {
         int bestTimeInt = PlayerPrefs.GetInt(bestTimeKey, int.MaxValue);
         bestTime = new TimeSpan(bestTimeInt);
-        bestTimeText.text = "Best Time" + raceTime.ToString("mm\\:ss");
+        bestTimeText.text = "Best Time" + bestTime.ToString("mm\\:ss");
     }
     void AddTimePenalty()
     {
@@ -39,6 +40,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("ending race");
         racing= false;
+        leaderboardUI.LoadLeaderboard();
         GameData.Instance.AddLevelTime((float)raceTime.TotalMilliseconds/1000f);
         if(raceTime<bestTime)
         {
@@ -46,6 +48,7 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt(bestTimeKey, (int)raceTime.Ticks);
             PlayerPrefs.Save();
         }
+        leaderboardUI.LoadLeaderboard();
     }
     void StartRace()
     {
